@@ -84,6 +84,13 @@ public class User implements UserDetails {
         return true;
     }
 
+    public boolean hasRole(String auth) {
+        for (Role role : user_roles) {
+            if (role.getRole().equals(auth)) { return true; }
+        }
+        return false;
+    }
+
     @Override
     public boolean isEnabled() {
         return this.active;
@@ -92,12 +99,12 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
-        return "BlogUser{" +
+        return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
 //                ", posts=" + posts +
-                ", roles=" + user_roles +
+                ", user_roles=" + user_roles +
                 '}';
     }
 

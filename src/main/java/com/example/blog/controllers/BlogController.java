@@ -2,17 +2,22 @@ package com.example.blog.controllers;
 
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Post;
+import com.example.blog.entities.User;
 import com.example.blog.service.PostService;
 import com.example.blog.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 
 @Log
@@ -22,6 +27,7 @@ public class BlogController {
 
 
     private PostService postService;
+    private UserService userService;
 
     @GetMapping(value = "/posts")
     public List<Post> posts()
@@ -60,11 +66,20 @@ public class BlogController {
     }
 
     @PostMapping(value = "/new_post")
-    public String publishPost(@Valid @ModelAttribute PostDTO postDTO, BindingResult bindingResult)
+    public String publishPost(@Valid @ModelAttribute PostDTO postDTO, BindingResult bindingResult, Principal principal)
     {
         if (bindingResult.hasErrors()) {
-            return "redirect:/";
+            return "new_post";
         }
+        log.severe("principal :" + principal.getName());
+        String username = principal.getName();
+        //if (principal != null) {
+        //    authUsername = principal.getName();
+        //}
+        Optional<User> optionaluser = userService.getUser(username);
+        log.severe("optional :" + optionaluser.get().getUsername());
+
+        postDTO.setPost_authors(optionaluser.get().getUsername());
         Post post = postService.postDTOtoPost(postDTO);
 
         postService.insert(post);
@@ -73,10 +88,20 @@ public class BlogController {
     }
 
     @GetMapping(value = "/new_post")
-    public String publishPost(Model model)
+    public String publishPost(Model model, Principal principal)
     {
-        PostDTO postDTO = new PostDTO();
-        model.addAttribute("post", postDTO);
+        log.severe(principal.getName());
+        String username = principal.getName();
+        //if (principal != null) {
+        //    authUsername = principal.getName();
+        //}
+        Optional<User> optionaluser = userService.getUser(username);
+        log.severe(optionaluser.get().getUsername());
+        //if (optionaluser.isPresent()) {
+            PostDTO postDTO = new PostDTO();
+
+            model.addAttribute("post", postDTO);
+       // }
 
         return "new_post";
     }
@@ -84,6 +109,7 @@ public class BlogController {
     @GetMapping("/post/{id}")
     public String getPost(@PathVariable Long id, Model model)
     {
+        log.severe("GET POST!!!");
         Post currentPost = postService.getPost(id);
 
             model.addAttribute("post", currentPost);

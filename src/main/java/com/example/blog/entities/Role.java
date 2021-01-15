@@ -28,9 +28,9 @@ public class Role implements GrantedAuthority {
 
     @Override
     public String toString() {
-        return "Authority{" +
+        return "Role{" +
                 "id=" + id +
-                ", users='" + users + '\'' +
+                ", role='" + role + '\'' +
 //                ", users=" + users +
                 '}';
     }
