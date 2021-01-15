@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
     <title>Blog App</title>
     <link rel="stylesheet" th:href="@{/stylesheet.css}">
 </head>
-
 <body>
 
 <header>
@@ -41,17 +38,33 @@
             <a th:href="@{'/sort' + '?sortField=tag'}">Tag</a>
         </span>
     </div>
+</header>
 
-
-<div class="posts_wrapper">
-    <div class="post" th:each="post : ${posts}">
-        <h2><a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}">Title</a></h2>
-        <p th:text="${post.post_content}">body</p>
-        <br>
-        <h5 th:text="'Published by ' + ${post.post_authors}">Post author</h5>
-        <br>
-        <p class="tags" th:text="${post.tag}">tags</p>
+<div class="container">
+    <div th:if="${param.error}">
+        <p class="alert-red">Invalid username and/or password</p>
     </div>
+    <div th:if="${param.logout}">
+        <p class="alert-green"> You have been successfully logged out</p>
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div>
+            <input type="text" name="username" id="username" placeholder="Username" required="true" autofocus="true"/>
+        </div>
+        <div>
+            <input type="password" name="password" id="password" placeholder="Password" required="true"/>
+        </div>
+        <div class="align-center">
+            <label for="remember-me">Remember Me</label>
+            <input type="checkbox" id="remember-me" name="remember-me">
+        </div>
+        <div>
+            <input type="submit" class="green-btn blue-btn" value="Login"/>
+        </div>
+
+    </form>
+
 </div>
 
 <footer>

@@ -5,11 +5,14 @@ import com.opencsv.bean.CsvBindByName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -17,17 +20,15 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = true)
     @Email(message = "Wrong email format")
-    @NotEmpty(message = "Field Email cant be empty")
     private String email;
-
 
 
     @NotEmpty(message = "Filed Username cant be empty")
@@ -40,7 +41,7 @@ public class User {
     private String password;
 
     @Column(name = "active", nullable = false)
-    private int active;
+    private boolean active;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "post_authors")
     private List<Post> posts = new ArrayList<>();
@@ -50,7 +51,7 @@ public class User {
             name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private List<User> user_roles = new ArrayList<>();
+    private List<Role> user_roles = new ArrayList<>();
 
     public User(String username) {
         this.username = username;
@@ -61,11 +62,43 @@ public class User {
         posts.add(post);
     }
 
-    User(){}
+    public User(){}
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.active;
+    }
+
 
     @Override
     public String toString() {
-        return "" + username;
+        return "BlogUser{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+//                ", posts=" + posts +
+                ", roles=" + user_roles +
+                '}';
     }
 
 }

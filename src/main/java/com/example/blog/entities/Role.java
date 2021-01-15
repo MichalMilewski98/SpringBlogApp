@@ -3,16 +3,20 @@ package com.example.blog.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Table(name ="roles")
 @Entity
-public class Role {
+public class Role implements GrantedAuthority {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -22,27 +26,17 @@ public class Role {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "user_roles")
     private Collection<User> users;
 
-    public Long getId() {
-        return id;
+    @Override
+    public String toString() {
+        return "Authority{" +
+                "id=" + id +
+                ", users='" + users + '\'' +
+//                ", users=" + users +
+                '}';
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Collection<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Collection<User> users) {
-        this.users = users;
+    @Override
+    public String getAuthority() {
+        return null;
     }
 }

@@ -38,7 +38,7 @@ public class CommentService {
 
     public List<Comment> findCommentsByUser(String username)
     {
-        return commentRepository.findCommentsByUser(userRepository.findByUsername(username));
+        return commentRepository.findCommentsByUser(userRepository.findUserByUsername(username));
     }
 
     public User getCommentAuthor(String author)
@@ -51,7 +51,7 @@ public class CommentService {
         }
         else
         {
-            return (userRepository.findByUsername(author));
+            return (userRepository.findUserByUsername(author));
         }
     }
 

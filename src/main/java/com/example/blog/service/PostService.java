@@ -48,7 +48,7 @@ public class PostService {
         List<User> users = new ArrayList<>();
         for (var autor : listOfStrings)
         {
-            if(userRepository.findByUsername(autor) == null)
+            if(!userRepository.findByUsername(autor).isPresent())
             {
                 User user = new User(autor);
                 userService.save(user);
@@ -56,7 +56,7 @@ public class PostService {
             }
             else
             {
-                users.add(userRepository.findByUsername(autor));
+                users.add(userRepository.findUserByUsername(author));
             }
         }
         return users;
