@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -43,16 +44,8 @@ public class CommentService {
 
     public User getCommentAuthor(String author)
     {
-        if(userRepository.findByUsername(author) == null)
-        {
-            User user = new User(author);
-            userService.save(user);
-            return user;
-        }
-        else
-        {
-            return (userRepository.findUserByUsername(author));
-        }
+        Optional<User> user = userRepository.findByUsername(author);
+        return user.get();
     }
 
     public Comment commentDtoToComment(CommentDTO commentDTO)

@@ -23,7 +23,7 @@ public class Role implements GrantedAuthority {
 
     private String role;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "user_roles")
+    @ManyToMany(mappedBy = "user_roles")
     private Collection<User> users;
 
     @Override

@@ -2,7 +2,9 @@ package com.example.blog.controllers;
 
 import com.example.blog.DTO.CommentDTO;
 import com.example.blog.entities.Comment;
+import com.example.blog.entities.User;
 import com.example.blog.service.CommentService;
+import com.example.blog.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
@@ -11,7 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Log
 @Controller
@@ -19,12 +23,16 @@ import java.util.List;
 public class CommentController {
 
     private CommentService commentService;
+    private UserService userService;
 
     @PostMapping(value = "/comment")
-    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, BindingResult bindingResult) {
+    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, BindingResult bindingResult, Principal principal) {
 
         if(bindingResult.hasErrors())
             return "redirect:/";
+        Optional<User> optionaluser = userService.getUser(principal.getName());
+
+        commentDTO.setUser(optionaluser.get().getUsername());
         Comment comment = commentService.commentDtoToComment(commentDTO);
         commentService.save(comment);
 

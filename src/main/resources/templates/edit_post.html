@@ -1,30 +1,48 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>Blog App</title>
     <link rel="stylesheet" th:href="@{/stylesheet.css}">
 </head>
+
 <body>
 
 <header>
     <div class="topnav">
         <a class="home" th:href="@{/}">Home</a>
-        <span>
+        <span sec:authorize="isAuthenticated()">
             <a class="left" th:href="@{/new_post}">New Post</a>
         </span>
-        <span>
-            <a class="right" th:href="@{/login}">Log In</a>
-            <a class="right" th:href="@{/signup}">Sign Up</a>
+        <span sec:authorize="isAuthenticated()">
+        <a class="right" th:href="@{/logout}">Logout</a>
         </span>
-        <span>
-            <a class="right">Upload files</a>
+        <span sec:authorize="isAuthenticated()">
+            <a class="right">Welcome <span sec:authentication="name">name?</span></a>
         </span>
+        <span sec:authorize="!isAuthenticated()">
+        <a class="right" th:href="@{/login}">Log In</a>
+        <a class="right" th:href="@{/register}">Sign Up</a>
+        </span>
+
     </div>
     <div class="header">
         <h2>Blog app</h2>
+        <span class ="right">
+            <form  th:action="@{/}" method="get">
+                <input id="txtSearch" type="text" name="keyword">
+                <button type="submit">Submit</button>
+            </form>
+            <h2>Sort by: </h2>
+            <a th:href="@{'/sort' + '?sortField=title'}">Title</a>
+            <a th:href="@{'/sort' + '?sortField=post_content'}">Text</a>
+            <a th:href="@{'/sort' + '?sortField=tag'}">Tag</a>
+        </span>
     </div>
 </header>
+
 
 <div class="container">
     <form action="#"
@@ -34,11 +52,10 @@
         <h2>Edit post</h2>
 
         <div>
+            <input type="hidden" th:field="*{post_authors}"/>
             <label>
                 <div class="alert-red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</div>
                 <input type="text" th:field="*{title}" placeholder="Title"/>
-                <div class="alert-red" th:if="${#fields.hasErrors('post_authors')}" th:errors="*{post_authors}">Title Error</div>
-                <input type="text" th:field="*{post_authors}" placeholder="Authors"/>
             </label>
         </div>
         <div>

@@ -13,7 +13,7 @@
 <header>
     <div class="topnav">
         <a class="home" th:href="@{/}">Home</a>
-        <span>
+        <span sec:authorize="isAuthenticated()">
             <a class="left" th:href="@{/new_post}">New Post</a>
         </span>
         <span sec:authorize="isAuthenticated()">
@@ -22,7 +22,7 @@
         <span sec:authorize="isAuthenticated()">
             <a class="right">Welcome <span sec:authentication="name">name?</span></a>
         </span>
-        <span>
+        <span sec:authorize="!isAuthenticated()">
         <a class="right" th:href="@{/login}">Log In</a>
         <a class="right" th:href="@{/register}">Sign Up</a>
         </span>
@@ -41,7 +41,7 @@
             <a th:href="@{'/sort' + '?sortField=tag'}">Tag</a>
         </span>
     </div>
-
+</header>
 
 <div class="posts_wrapper">
     <div class="post" th:each="post : ${posts}">

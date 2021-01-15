@@ -21,14 +21,17 @@ public class PostDTO {
     @CsvBindByName
     private String post_authors;
 
+    private boolean is_private;
 
-    public PostDTO(Long id, String title, String post_content, String post_authors, String tag) {
+
+    public PostDTO(Long id, String title, String post_content, String post_authors, String tag, boolean is_private) {
 
         this.id = id;
         this.title = title;
         this.post_content = post_content;
         this.post_authors = post_authors;
         this.tag = tag;
+        this.is_private = is_private;
     }
 
     public PostDTO(){}

@@ -20,7 +20,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "post_authors",
             joinColumns = {@JoinColumn(name = "post_id")},
@@ -42,12 +42,15 @@ public class Post {
 
     private String tag;
 
-    public Post(Long id, List<User> post_authors, String title, String post_content, String tag) {
+    private boolean is_private;
+
+    public Post(Long id, List<User> post_authors, String title, String post_content, String tag, boolean is_private) {
         this.id = id;
         this.post_authors = post_authors;
         this.title = title;
         this.post_content = post_content;
         this.tag = tag;
+        this.is_private = is_private;
     }
 
     public Post(){}

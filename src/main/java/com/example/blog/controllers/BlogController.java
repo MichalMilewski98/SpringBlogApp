@@ -16,6 +16,7 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,11 +47,22 @@ public class BlogController {
     public String getHomepage(Model model, String keyword)
     {
         List<Post> posts = postService.getAllPosts();
+        List<PostDTO> postsDTO = new ArrayList<>();
+        for (Post post : posts)
+        {
+            postsDTO.add(postService.postToPostDTO(post));
+        }
         List<Post> filteredPosts = postService.findByKeyword(keyword);
+        List<PostDTO> filteredPostsDTO = new ArrayList<>();
+        for (Post post : filteredPosts)
+        {
+            filteredPostsDTO.add(postService.postToPostDTO(post));
+        }
+
         if(keyword!=null)
-            model.addAttribute("posts", filteredPosts);
+            model.addAttribute("posts", filteredPostsDTO);
         else
-            model.addAttribute("posts", posts);
+            model.addAttribute("posts", postsDTO);
 
         return "index";
     }
@@ -109,7 +121,7 @@ public class BlogController {
     @GetMapping("/post/{id}")
     public String getPost(@PathVariable Long id, Model model)
     {
-        log.severe("GET POST!!!");
+        log.severe("GET POST!!!" + id);
         Post currentPost = postService.getPost(id);
 
             model.addAttribute("post", currentPost);

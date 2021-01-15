@@ -43,10 +43,10 @@ public class User implements UserDetails {
     @Column(name = "active", nullable = false)
     private boolean active;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "post_authors")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "post_authors")
     private List<Post> posts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
@@ -99,13 +99,22 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
+        return "" + username;
+    }
+
+
+
+  /*  @Override
+    public String toString() {
         return "User{" +
-                "id=" + id +
+//                "id=" + id +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
+//                ", password='" + password + '\'' +
 //                ", posts=" + posts +
-                ", user_roles=" + user_roles +
+//                ", user_roles=" + user_roles +
                 '}';
     }
+
+   */
 
 }

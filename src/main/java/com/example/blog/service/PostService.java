@@ -73,13 +73,13 @@ public class PostService {
 
     public Post postDTOtoPost(PostDTO postDTO)
     {
-        Post post = new Post(postDTO.getId(), authorList(postDTO.getPost_authors()), postDTO.getTitle(), postDTO.getPost_content(), postDTO.getTag());
+        Post post = new Post(postDTO.getId(), authorList(postDTO.getPost_authors()), postDTO.getTitle(), postDTO.getPost_content(), postDTO.getTag(), postDTO.is_private());
         return post;
     }
 
     public PostDTO postToPostDTO(Post post)
     {
-        PostDTO postDTO = new PostDTO(post.getId(), post.getTitle(), post.getPost_content(), usernamesList(post.getPost_authors()), post.getTag());
+        PostDTO postDTO = new PostDTO(post.getId(), post.getTitle(), post.getPost_content(), usernamesList(post.getPost_authors()), post.getTag(), post.is_private());
                 return postDTO;
     }
 }
