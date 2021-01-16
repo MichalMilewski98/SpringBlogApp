@@ -1,19 +1,17 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
 <head>
     <meta charset="UTF-8">
     <title>Blog App</title>
     <link rel="stylesheet" th:href="@{/stylesheet.css}">
 </head>
-
 <body>
 
 <header>
     <div class="topnav">
         <a class="home" th:href="@{/}">Home</a>
-        <span sec:authorize="isAuthenticated()">
+        <span sec:authorize="hasRole('ROLE_USER')">
             <a class="left" th:href="@{/new_post}">New Post</a>
         </span>
         <span sec:authorize="isAuthenticated()">
@@ -43,37 +41,28 @@
     </div>
 </header>
 
+<div class="container" th:class="align-center">
 
-<div class="container">
-
-    <h2>New comment</h2>
+    <h2>Register new user</h2>
 
     <form action="#"
-          th:action="@{'/comment'}"
-          th:object="${comment}"
+          th:action="@{/register}"
+          th:object="${user}"
           method="post">
         <div>
-            <input type="hidden" th:field="*{post_id}"/>
-            <input type="hidden" th:field="*{id}"/>
+            <label>
+                <div class="alert-red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email error
+                </div>
+                <input type="text" th:field="*{email}" placeholder="Email"/>
+            </label>
         </div>
-
-
-        <label>
-            <span sec:authorize="!isAuthenticated()">
-                 <div th:object="${user}" >
-                <input type="text" th:field="*{username}" id="username" placeholder="Username"/>
-                 </div>
-            </span>
-        </label>
-        <label>
-            <div class="alert-red" th:if="${#fields.hasErrors('body')}" th:errors="{comment.body}">Body Error</div>
-            <textarea th:field="*{body}" placeholder="Comment text"></textarea>
-        </label>
         <div>
-            <button class="green-btn" type="submit">Send</button>
-            </div>
+            <button class="green-btn" type="submit">Register</button>
+        </div>
     </form>
 </div>
+
+<!-- /.container -->
 
 <footer>
     <div class="footer">

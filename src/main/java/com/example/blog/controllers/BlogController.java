@@ -43,6 +43,30 @@ public class BlogController {
         return postService.getAllPosts();
     }
 
+    @GetMapping("/user_posts")
+    public String getUserHomepage(Model model, String keyword)
+    {
+        List<Post> posts = postService.getUserPosts();
+        List<PostDTO> postsDTO = new ArrayList<>();
+        for (Post post : posts)
+        {
+            postsDTO.add(postService.postToPostDTO(post));
+        }
+        List<Post> filteredPosts = postService.findByKeyword(keyword);
+        List<PostDTO> filteredPostsDTO = new ArrayList<>();
+        for (Post post : filteredPosts)
+        {
+            filteredPostsDTO.add(postService.postToPostDTO(post));
+        }
+
+        if(keyword!=null)
+            model.addAttribute("posts", filteredPostsDTO);
+        else
+            model.addAttribute("posts", postsDTO);
+
+        return "index";
+    }
+
     @GetMapping("/")
     public String getHomepage(Model model, String keyword)
     {
@@ -90,6 +114,7 @@ public class BlogController {
         //}
         Optional<User> optionaluser = userService.getUser(username);
         log.severe("optional :" + optionaluser.get().getUsername());
+        log.severe("optional :" + postDTO.is_private());
 
         postDTO.setPost_authors(optionaluser.get().getUsername());
         Post post = postService.postDTOtoPost(postDTO);
@@ -102,20 +127,23 @@ public class BlogController {
     @GetMapping(value = "/new_post")
     public String publishPost(Model model, Principal principal)
     {
-        log.severe(principal.getName());
-        String username = principal.getName();
-        //if (principal != null) {
-        //    authUsername = principal.getName();
-        //}
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
+
         Optional<User> optionaluser = userService.getUser(username);
-        log.severe(optionaluser.get().getUsername());
-        //if (optionaluser.isPresent()) {
+        //log.severe(optionaluser.get().getUsername());
+        if (optionaluser.isPresent()) {
             PostDTO postDTO = new PostDTO();
-
             model.addAttribute("post", postDTO);
-       // }
+            return "new_post";
+        }
+        else
+        {
+            return "index";
+        }
 
-        return "new_post";
     }
 
     @GetMapping("/post/{id}")
@@ -129,12 +157,25 @@ public class BlogController {
     }
 
     @GetMapping("/delete_post/{id}")
-    public String deletePost(@PathVariable Long id)
+    public String deletePost(@PathVariable Long id, Principal principal)
     {
+        boolean check = false;
         Post post = postService.getPost(id);
-        postService.delete(id);
+        for (User user : post.getPost_authors())
+        {
+            if(user.getUsername().equals(principal.getName()))
+            {
+                check = true;
+                break;
+            }
+        }
+        if(check)
+        {
+            postService.delete(id);
+            return "redirect:/";
+        }
 
-        return "redirect:/";
+        return "redirect:/post/" + id;
     }
 
     @GetMapping("edit_post/{id}")

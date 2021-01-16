@@ -1,6 +1,7 @@
 package com.example.blog.controllers;
 
 import com.example.blog.DTO.CommentDTO;
+import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Comment;
 import com.example.blog.entities.User;
 import com.example.blog.service.CommentService;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.relation.RoleNotFoundException;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -26,25 +28,51 @@ public class CommentController {
     private UserService userService;
 
     @PostMapping(value = "/comment")
-    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, BindingResult bindingResult, Principal principal) {
+    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, /* @ModelAttribute @Valid User user*/ BindingResult bindingResult, Principal principal/*, Model model*/) throws RoleNotFoundException {
+        log.severe("COS TAM");
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
+        Optional<User> optionaluser = userService.getUser(username);
 
         if(bindingResult.hasErrors())
+        {
+            log.severe("BINDING ERROR");
             return "redirect:/";
-        Optional<User> optionaluser = userService.getUser(principal.getName());
+        }
 
-        commentDTO.setUser(optionaluser.get().getUsername());
-        Comment comment = commentService.commentDtoToComment(commentDTO);
-        commentService.save(comment);
 
-        return "redirect:/post/" + comment.getPost().getId();
+        if(optionaluser.isPresent()) {
+            commentDTO.setUser(optionaluser.get().getUsername());
+            Comment comment = commentService.commentDtoToComment(commentDTO);
+            commentService.save(comment);
+            log.severe("JEST ZALOGOWANY");
+            return "redirect:/post/" + comment.getPost().getId();
+        }
+        else
+        {
+            log.severe("NIE JEST ZALOGOWANY");
+            //userService.saveNewBlogUser(user);
+            //commentDTO.setUser(user.getUsername());
+            //Comment comment = commentService.commentDtoToComment(commentDTO);
+            //commentService.save(comment);
+            //model.addAttribute("user", user);
+            //return "comment_register";
+            return "redirect:/";
+        }
+
+
     }
 
     @GetMapping(value = "/comment/{id}")
     public String showComment(@PathVariable Long id, Model model) {
 
         CommentDTO commentDTO = new CommentDTO();
+        User user = new User();
         commentDTO.setPost_id(id);
         model.addAttribute("comment", commentDTO);
+        model.addAttribute("user", user);
         return "/new_comment";
     }
 
@@ -66,19 +94,50 @@ public class CommentController {
     }
 
     @GetMapping(value = "/edit_comment/{id}")
-    public String getEditComment(@PathVariable Long id, Model model) {
+    public String getEditComment(@PathVariable Long id, Model model, Principal principal) {
 
-       Comment currentComment = commentService.getComment(id);
-       CommentDTO commentDTO = commentService.commentToCommentDto(currentComment);
-       model.addAttribute("comment", commentDTO);
-        return "edit_comment";
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
+
+        Optional<User> optionaluser = userService.getUser(username);
+
+
+
+        if (optionaluser.isPresent())
+        {
+            Comment currentComment = commentService.getComment(id);
+            CommentDTO commentDTO = commentService.commentToCommentDto(currentComment);
+            model.addAttribute("comment", commentDTO);
+            return "edit_comment";
+        }
+        else
+        {
+            return "index";
+        }
+
     }
 
     @PostMapping(value = "/update_comment/{id}")
-    public String editComment(@Valid @ModelAttribute CommentDTO commentDTO, BindingResult result) {
+    public String editComment(@Valid @ModelAttribute CommentDTO commentDTO, BindingResult result, Principal principal) {
 
-        Comment comment = commentService.commentDtoToComment(commentDTO);
-        commentService.save(comment);
-        return "redirect:/post/" + commentDTO.getPost_id();
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
+        Optional<User> optionaluser = userService.getUser(username);
+        if (optionaluser.isPresent())
+        {
+            if(principal.getName() == commentDTO.getUser()) {
+                Comment comment = commentService.commentDtoToComment(commentDTO);
+                commentService.save(comment);
+                return "redirect:/post/" + commentDTO.getPost_id();
+            }
+            else
+                return "error";
+        }
+        else
+            return "error";
     }
 }

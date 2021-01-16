@@ -34,5 +34,6 @@ public class PostDTO {
         this.is_private = is_private;
     }
 
+
     public PostDTO(){}
 }

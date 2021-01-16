@@ -1,7 +1,6 @@
 package com.example.blog.service;
 
 import com.example.blog.DTO.PostDTO;
-import com.example.blog.entities.Comment;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
 import com.example.blog.entities.exception.PostNotFoundException;
@@ -39,6 +38,17 @@ public class PostService {
     public Post getPost(Long id) {return postRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));}
 
     public void delete(Long id) {postRepository.deleteById(id);}
+
+    public List<Post> getUserPosts()
+    {
+        List<Post> userPosts = new ArrayList<>();
+        for (Post post : postRepository.findAll())
+        {
+            if(post.is_private())
+                userPosts.add(post);
+        }
+        return userPosts;
+    }
 
     public List<Post> findByKeyword(String keyword){return postRepository.findByKeyword(keyword);}
 

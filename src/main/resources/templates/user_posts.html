@@ -43,36 +43,15 @@
     </div>
 </header>
 
-
-<div class="container">
-
-    <h2>New comment</h2>
-
-    <form action="#"
-          th:action="@{'/comment'}"
-          th:object="${comment}"
-          method="post">
-        <div>
-            <input type="hidden" th:field="*{post_id}"/>
-            <input type="hidden" th:field="*{id}"/>
-        </div>
-
-
-        <label>
-            <span sec:authorize="!isAuthenticated()">
-                 <div th:object="${user}" >
-                <input type="text" th:field="*{username}" id="username" placeholder="Username"/>
-                 </div>
-            </span>
-        </label>
-        <label>
-            <div class="alert-red" th:if="${#fields.hasErrors('body')}" th:errors="{comment.body}">Body Error</div>
-            <textarea th:field="*{body}" placeholder="Comment text"></textarea>
-        </label>
-        <div>
-            <button class="green-btn" type="submit">Send</button>
-            </div>
-    </form>
+<div class="posts_wrapper">
+    <div class="post" th:each="post : ${posts}">
+        <h2><a th:href="@{'/post/' + ${post.id}}" th:text="${post.title}">Title</a></h2>
+        <p th:text="${post.post_content}">body</p>
+        <br>
+        <h5 th:text="'Published by ' + ${post.post_authors}">Post author</h5>
+        <br>
+        <p class="tags" th:text="${post.tag}">tags</p>
+    </div>
 </div>
 
 <footer>
