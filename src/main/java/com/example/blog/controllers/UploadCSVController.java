@@ -54,7 +54,7 @@ public class UploadCSVController {
                     System.out.println("ID: " + post.getId());
                     System.out.println("Names: " + post.getPost_authors());
                     System.out.println("Content: " + post.getPost_content());
-                    System.out.println("Tags: " + post.getTag());
+                    //System.out.println("Tags: " + post.getTag());
                 }
 
                 // convert `CsvToBean` object to list of users

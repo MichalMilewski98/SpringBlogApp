@@ -27,6 +27,13 @@ public class Post {
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> post_authors = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "post_tags",
+            joinColumns = {@JoinColumn(name = "post_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+    private List<Tag> post_tags = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
@@ -40,17 +47,18 @@ public class Post {
     @Column(length=9999)
     private String post_content;
 
-    private String tag;
+    //private String tag;
 
-    private boolean is_private;
 
-    public Post(Long id, List<User> post_authors, String title, String post_content, String tag, boolean is_private) {
+    private boolean isprivate;
+
+    public Post(Long id, List<User> post_authors, String title, String post_content, List<Tag> tag, boolean isprivate) {
         this.id = id;
         this.post_authors = post_authors;
         this.title = title;
         this.post_content = post_content;
-        this.tag = tag;
-        this.is_private = is_private;
+        this.post_tags = tag;
+        this.isprivate = isprivate;
     }
 
     public Post(){}

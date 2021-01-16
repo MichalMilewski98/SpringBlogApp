@@ -2,17 +2,17 @@ package com.example.blog.service;
 
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Post;
+import com.example.blog.entities.Tag;
 import com.example.blog.entities.User;
 import com.example.blog.entities.exception.PostNotFoundException;
 import com.example.blog.repositories.PostRepository;
+import com.example.blog.repositories.TagRepository;
 import com.example.blog.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.var;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @AllArgsConstructor
@@ -21,6 +21,7 @@ public class PostService {
 
     private PostRepository postRepository;
     private UserRepository userRepository;
+    private TagRepository tagRepository;
     private UserService userService;
 
     public List<Post> getAllPosts()
@@ -44,13 +45,42 @@ public class PostService {
         List<Post> userPosts = new ArrayList<>();
         for (Post post : postRepository.findAll())
         {
-            if(post.is_private())
+            if(post.isIsprivate())
+                userPosts.add(post);
+        }
+        return userPosts;
+    }
+
+    public List<Post> getPublicPosts()
+    {
+        List<Post> userPosts = new ArrayList<>();
+        for (Post post : postRepository.findAll())
+        {
+            if(!post.isIsprivate())
                 userPosts.add(post);
         }
         return userPosts;
     }
 
     public List<Post> findByKeyword(String keyword){return postRepository.findByKeyword(keyword);}
+
+    public List<Tag> tagList(String tag_name)
+    {
+        List<String> listOfStrings = Arrays.asList(tag_name.split("[ ,]+"));
+        List<Tag> tags = new ArrayList<>();
+
+        for (var _tag : listOfStrings) {
+            if (!tagRepository.findByName(_tag).isPresent()) {
+                Tag tag = new Tag(_tag);
+                tagRepository.save(tag);
+                tags.add(tag);
+            } else {
+                tags.add(tagRepository.findByName(_tag).get());
+            }
+
+        }
+        return tags;
+    }
 
     public List<User> authorList(String author)
     {
@@ -75,6 +105,17 @@ public class PostService {
         return usernames;
     }
 
+    public String tagsList(List<Tag> tags)
+    {
+        String tag_names ="";
+        for (var tag : tags)
+        {
+            tag_names += tag.getName() + ",";
+        }
+
+        return tag_names;
+    }
+
     public List<Post> sortPosts(String sortField)
     {
         Sort sort = Sort.by(sortField).ascending();
@@ -83,13 +124,13 @@ public class PostService {
 
     public Post postDTOtoPost(PostDTO postDTO)
     {
-        Post post = new Post(postDTO.getId(), authorList(postDTO.getPost_authors()), postDTO.getTitle(), postDTO.getPost_content(), postDTO.getTag(), postDTO.is_private());
+        Post post = new Post(postDTO.getId(), authorList(postDTO.getPost_authors()), postDTO.getTitle(), postDTO.getPost_content(), tagList(postDTO.getTag()), postDTO.isIsprivate());
         return post;
     }
 
     public PostDTO postToPostDTO(Post post)
     {
-        PostDTO postDTO = new PostDTO(post.getId(), post.getTitle(), post.getPost_content(), usernamesList(post.getPost_authors()), post.getTag(), post.is_private());
+        PostDTO postDTO = new PostDTO(post.getId(), post.getTitle(), post.getPost_content(), usernamesList(post.getPost_authors()), tagsList(post.getPost_tags()), post.isIsprivate());
                 return postDTO;
     }
 }

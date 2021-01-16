@@ -70,7 +70,7 @@ public class BlogController {
     @GetMapping("/")
     public String getHomepage(Model model, String keyword)
     {
-        List<Post> posts = postService.getAllPosts();
+        List<Post> posts = postService.getPublicPosts();
         List<PostDTO> postsDTO = new ArrayList<>();
         for (Post post : posts)
         {
@@ -114,7 +114,7 @@ public class BlogController {
         //}
         Optional<User> optionaluser = userService.getUser(username);
         log.severe("optional :" + optionaluser.get().getUsername());
-        log.severe("optional :" + postDTO.is_private());
+        log.severe("optional :" + postDTO.isIsprivate());
 
         postDTO.setPost_authors(optionaluser.get().getUsername());
         Post post = postService.postDTOtoPost(postDTO);
