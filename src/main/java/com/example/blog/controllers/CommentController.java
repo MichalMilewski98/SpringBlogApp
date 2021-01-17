@@ -3,8 +3,10 @@ package com.example.blog.controllers;
 import com.example.blog.DTO.CommentDTO;
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Comment;
+import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
 import com.example.blog.service.CommentService;
+import com.example.blog.service.PostService;
 import com.example.blog.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.management.relation.RoleNotFoundException;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,7 @@ public class CommentController {
 
     private CommentService commentService;
     private UserService userService;
+    private PostService postService;
 
     @PostMapping(value = "/comment")
     public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, /* @ModelAttribute @Valid User user*/ BindingResult bindingResult, Principal principal/*, Model model*/) throws RoleNotFoundException {
@@ -120,24 +124,38 @@ public class CommentController {
     }
 
     @PostMapping(value = "/update_comment/{id}")
-    public String editComment(@Valid @ModelAttribute CommentDTO commentDTO, BindingResult result, Principal principal) {
+    public String editComment(@Valid @ModelAttribute CommentDTO commentDTO, Principal principal) {
 
         String username="";
         if(principal != null) {
             username = principal.getName();
         }
         Optional<User> optionaluser = userService.getUser(username);
+        log.severe("comment user : " + commentDTO.getUser());
+        log.severe(principal.getName());
+        Long postId = commentDTO.getPost_id();
+        Post post = postService.getPost(postId);
+        List<User> authors = post.getPost_authors();
+
         if (optionaluser.isPresent())
         {
-            if(principal.getName() == commentDTO.getUser()) {
+            if(username.equals(commentDTO.getUser()) || userService.isAuthor(authors, username))
+            {
                 Comment comment = commentService.commentDtoToComment(commentDTO);
                 commentService.save(comment);
                 return "redirect:/post/" + commentDTO.getPost_id();
             }
             else
-                return "error";
+            {
+                log.severe("principal get name");
+                return "index";
+            }
         }
         else
-            return "error";
+        {
+            log.severe("optional not found");
+            return "index";
+        }
+
     }
 }

@@ -57,7 +57,17 @@ public class  UserService implements UserDetailsService {
             throw new RoleNotFoundException("Default role not found for blog user with username " + user.getUsername());
         }
     }
+    public boolean isAuthor(List<User> users, String username)
+    {
+        for (User user:users)
+        {
+            if(user.getUsername().equals(username))
+                return true;
+        }
+        return false;
+    }
 
+    public Optional<User> getUserById(Long id) { return userRepository.findById(id); }
 
     public void save(User user){
         userRepository.save(user);

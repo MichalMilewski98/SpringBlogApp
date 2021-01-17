@@ -3,6 +3,7 @@ package com.example.blog.controllers;
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
+import com.example.blog.entities.Validation.PasswordGeneration;
 import com.example.blog.service.PostService;
 import com.example.blog.service.UserService;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,6 @@ import java.util.Optional;
 @Controller
 @AllArgsConstructor
 public class BlogController {
-
 
     private PostService postService;
     private UserService userService;
@@ -143,7 +143,6 @@ public class BlogController {
         {
             return "index";
         }
-
     }
 
     @GetMapping("/post/{id}")

@@ -54,7 +54,6 @@
         <br>
         <h5 th:text="'Published by ' + ${post.post_authors}">Post author</h5>
         <br>
-        <p class="tags" th:text="${post.tag}">tags</p>
         <div class="align-right">
             <a th:href="@{'/edit_post/{id}'(id=${post.id})}">
                 <button class="green-btn blue-btn" type="button">Edit</button>
@@ -71,14 +70,17 @@
             <!--    <h4 th:text="'Commented on ' + ${#dates.format(comment.creationDate, 'yyyy-MM-dd')}">Comment date</h4> -->
             <p th:text="${comment.body}">Comment body</p>
             <h5> <a th:href="@{${comment.user} + '/comments/'}" th:text="'Published by ' + ${comment.user}">Post author</a></h5>
+            <span sec:authorize="isAuthenticated()">
             <a th:href="@{'/delete_comment/{id}'(id=${comment.id})}">
                 <button class="green-btn red-btn" type="button">Delete</button>
             </a>
+            </span>
+            <span sec:authorize="isAuthenticated()">
             <a th:href="@{'/edit_comment/{id}'(id=${comment.id})}">
                 <button class="green-btn red-btn" type="button">Edit</button>
             </a>
+            </span>
         </div>
-
     </div>
 
     <div class="align-center">

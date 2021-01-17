@@ -40,7 +40,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/**").hasRole("ADMIN")
-                .antMatchers("/new_post/**", "/edit_post/**", "/post/**", "/delete_post/**", "/my_posts/**").hasRole("USER")
+                .antMatchers("/new_post/**", "/edit_post/**", "/post/**", "/delete_post/**", "/my_posts/**", "/comment/**", "/new_comment/**").hasRole("USER")
 //                .antMatchers("/new_post/**", "/edit_post/**", "/post/**").hasRole("USER")
 //                .antMatchers("/deletePost/**").hasRole("USER")
 //                .antMatchers("/deletePost/**").hasRole("ADMIN")

@@ -1,9 +1,11 @@
 package com.example.blog.entities;
 
+import com.example.blog.entities.Validation.ValidPassword;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.CsvBindByName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.checkerframework.common.aliasing.qual.Unique;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,16 +28,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "email", unique = true, nullable = true)
+    @Column(name = "email", unique = true)
     @Email(message = "Wrong email format")
     private String email;
 
-
-    @NotEmpty(message = "Filed Username cant be empty")
+    @Unique
+    @NotEmpty(message = "Username cant be empty")
     @Length(max = 30, message = "Username cant be longer than 30 characters")
     private String username;
 
-    @Length(min = 5, message = "*Your password must have at least 5 characters")
+    @ValidPassword
     @NotEmpty(message = "Field password cant be empty")
     @JsonIgnore
     private String password;
