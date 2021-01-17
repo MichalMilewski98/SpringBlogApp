@@ -1,7 +1,9 @@
 package com.example.blog.service;
 
 import com.example.blog.DTO.CommentDTO;
+import com.example.blog.DTO.CommentUserDTO;
 import com.example.blog.entities.Comment;
+import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
 import com.example.blog.entities.exception.PostNotFoundException;
 import com.example.blog.repositories.CommentRepository;
@@ -58,6 +60,12 @@ public class CommentService {
     {
         CommentDTO commentDTO = new CommentDTO(comment.getId(), comment.getBody(), comment.getUser().getUsername(), comment.getPost().getId());
         return commentDTO;
+    }
+
+    public Comment commentUserDTOtoComment(CommentUserDTO commentUserDTO)
+    {
+        Comment comment = new Comment(commentUserDTO.getId(), commentUserDTO.getBody(), getCommentAuthor(commentUserDTO.getUser()), postService.getPost(commentUserDTO.getPost_id()));
+        return comment;
     }
 
 }

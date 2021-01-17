@@ -1,5 +1,6 @@
 package com.example.blog.service;
 
+import com.example.blog.DTO.CommentUserDTO;
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.Tag;
@@ -133,4 +134,6 @@ public class PostService {
         PostDTO postDTO = new PostDTO(post.getId(), post.getTitle(), post.getPost_content(), usernamesList(post.getPost_authors()), tagsList(post.getPost_tags()), post.isIsprivate());
                 return postDTO;
     }
+
+
 }

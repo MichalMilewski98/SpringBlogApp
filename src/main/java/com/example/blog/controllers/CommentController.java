@@ -1,11 +1,14 @@
 package com.example.blog.controllers;
 
 import com.example.blog.DTO.CommentDTO;
+import com.example.blog.DTO.CommentUserDTO;
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Comment;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
+import com.example.blog.entities.Validation.PasswordGeneration;
 import com.example.blog.service.CommentService;
+import com.example.blog.service.EmailService;
 import com.example.blog.service.PostService;
 import com.example.blog.service.UserService;
 import lombok.AllArgsConstructor;
@@ -30,9 +33,10 @@ public class CommentController {
     private CommentService commentService;
     private UserService userService;
     private PostService postService;
+    private EmailService emailService;
 
-    @PostMapping(value = "/comment")
-    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, /* @ModelAttribute @Valid User user*/ BindingResult bindingResult, Principal principal/*, Model model*/) throws RoleNotFoundException {
+  /*  @PostMapping(value = "/comment")
+    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, @ModelAttribute @Valid User user,BindingResult bindingResult, Principal principal, Model model) throws RoleNotFoundException {
         log.severe("COS TAM");
         String username="";
         if(principal != null) {
@@ -65,18 +69,66 @@ public class CommentController {
             //return "comment_register";
             return "redirect:/";
         }
+    }
+    */
+
+    @PostMapping(value = "/comment")
+    public String createNewComment(@ModelAttribute @Valid CommentUserDTO commentUserDTO, BindingResult bindingResult, Principal principal) throws RoleNotFoundException {
+        log.severe("COS TAM");
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
+        Optional<User> optionaluser = userService.getUser(username);
+
+        if(bindingResult.hasErrors())
+        {
+            log.severe("BINDING ERROR");
+            return "redirect:/";
+        }
 
 
+        if(optionaluser.isPresent()) {
+            commentUserDTO.setUser(optionaluser.get().getUsername());
+            Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
+            commentService.save(comment);
+            log.severe("JEST ZALOGOWANY");
+            return "redirect:/post/" + comment.getPost().getId();
+        }
+        else
+        {
+            log.severe("NIE JEST ZALOGOWANY");
+            User user = userService.commentUserDTOtoUser(commentUserDTO);
+            user.setEmail("michal.milewski98@gmail.com");
+            //user.setPassword("PASSWORD");
+            user.setPassword(PasswordGeneration.generatePassword());
+            emailService.sendEmail(user, user.getPassword());
+            userService.saveNewBlogUser(user);
+            commentUserDTO.setUser(user.getUsername());
+            Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
+            commentService.save(comment);
+            //model.addAttribute("user", user);
+            //return "comment_register";
+            return "redirect:/";
+        }
     }
 
     @GetMapping(value = "/comment/{id}")
     public String showComment(@PathVariable Long id, Model model) {
 
-        CommentDTO commentDTO = new CommentDTO();
+       /* CommentDTO commentDTO = new CommentDTO();
         User user = new User();
         commentDTO.setPost_id(id);
         model.addAttribute("comment", commentDTO);
         model.addAttribute("user", user);
+        return "/new_comment";
+
+        */
+
+        CommentUserDTO commentUserDTO = new CommentUserDTO();
+        //User user = new User();
+        commentUserDTO.setPost_id(id);
+        model.addAttribute("comment", commentUserDTO);
         return "/new_comment";
     }
 

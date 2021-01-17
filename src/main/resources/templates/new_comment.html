@@ -63,9 +63,7 @@
 
         <label>
             <span sec:authorize="!isAuthenticated()">
-                 <div th:object="${user}" >
                 <input type="text" th:field="*{username}" id="username" placeholder="Username"/>
-                 </div>
             </span>
         </label>
         <label>

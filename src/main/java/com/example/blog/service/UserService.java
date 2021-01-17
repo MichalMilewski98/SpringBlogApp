@@ -1,5 +1,6 @@
 package com.example.blog.service;
 
+import com.example.blog.DTO.CommentUserDTO;
 import com.example.blog.entities.Role;
 import com.example.blog.entities.User;
 import com.example.blog.repositories.RoleRepository;
@@ -65,6 +66,12 @@ public class  UserService implements UserDetailsService {
                 return true;
         }
         return false;
+    }
+
+    public User commentUserDTOtoUser(CommentUserDTO commentUserDTO)
+    {
+        User user = new User(commentUserDTO.getUsername());
+        return user;
     }
 
     public Optional<User> getUserById(Long id) { return userRepository.findById(id); }
