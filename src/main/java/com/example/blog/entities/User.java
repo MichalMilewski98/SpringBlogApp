@@ -64,6 +64,12 @@ public class User implements UserDetails {
         posts.add(post);
     }
 
+    public User(Long id, String email)
+    {
+        this.id = id;
+        this.email = email;
+    }
+
     public User(){}
 
     @Override

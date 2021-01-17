@@ -1,6 +1,7 @@
 package com.example.blog.service;
 
 import com.example.blog.DTO.CommentUserDTO;
+import com.example.blog.DTO.UserRegisterDTO;
 import com.example.blog.entities.Role;
 import com.example.blog.entities.User;
 import com.example.blog.repositories.RoleRepository;
@@ -48,16 +49,43 @@ public class  UserService implements UserDetailsService {
         user.setActive(true);
         // Set default Authority/Role to new blog user
         Optional<Role> optionalRole = this.roleRepository.findByRole(DEFAULT_ROLE);
-        if (optionalRole.isPresent()) {
+
+        if (optionalRole.isPresent())
+        {
             Role role = optionalRole.get();
             List<Role> roles = Collections.singletonList(role);
             user.setUser_roles(roles);
 
             return this.userRepository.saveAndFlush(user);
-        } else {
-            throw new RoleNotFoundException("Default role not found for blog user with username " + user.getUsername());
+        }
+        else
+        {
+            Role role = new Role("ROLE_USER");
+            roleRepository.save(role);
+            List<Role> roles = Collections.singletonList(role);
+            user.setUser_roles(roles);
+            //throw new RoleNotFoundException("Default role not found for blog user with username " + user.getUsername());
+            return this.userRepository.saveAndFlush(user);
         }
     }
+
+    public User saveAdmin(String username, String password, String email) throws RoleNotFoundException {
+
+        User user = new User();
+        user.setPassword(this.bcryptEncoder.encode(password));
+        user.setUsername(username);
+        user.setEmail(email);
+        // set account to enabled by default
+        user.setActive(true);
+
+        Role role = new Role("ROLE_ADMIN");
+        roleRepository.save(role);
+        List<Role> roles = Collections.singletonList(role);
+        user.setUser_roles(roles);
+
+        return this.userRepository.saveAndFlush(user);
+    }
+
     public boolean isAuthor(List<User> users, String username)
     {
         for (User user:users)
@@ -89,4 +117,10 @@ public class  UserService implements UserDetailsService {
     }
 
     public Optional<User> getUserByEmail(String email) { return userRepository.findByEmail(email); }
+
+    public User UserRegisterDTOtoUser(UserRegisterDTO userRegisterDTO)
+    {
+        User user = new User(userRegisterDTO.getId(), userRegisterDTO.getEmail());
+        return user;
+    }
 }

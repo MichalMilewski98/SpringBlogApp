@@ -71,9 +71,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .dataSource(dataSource)
                 .passwordEncoder(bcryptEncoder());
 
-        authenticationManagerBuilder
-                .inMemoryAuthentication()
-                .withUser("user").password(bcryptEncoder().encode("password")).roles("USER").and()
-                .withUser("admin").password(bcryptEncoder().encode("password")).roles("USER", "ADMIN");
+//        authenticationManagerBuilder
+//                .inMemoryAuthentication()
+//                .withUser("user").password(bcryptEncoder().encode("password")).roles("USER").and()
+//                .withUser("admin").password(bcryptEncoder().encode("password")).roles("USER", "ADMIN");
     }
 }

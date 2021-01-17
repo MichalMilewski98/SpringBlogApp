@@ -46,10 +46,11 @@
     <h2>Register new user</h2>
 
     <form action="#"
-          th:action="@{/register}"
+          th:action="@{/commentRegister}"
           th:object="${user}"
           method="post">
         <div>
+            <input type="hidden" th:field="*{id}"/>
             <label>
                 <div class="alert-red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email error
                 </div>

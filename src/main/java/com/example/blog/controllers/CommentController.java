@@ -3,6 +3,7 @@ package com.example.blog.controllers;
 import com.example.blog.DTO.CommentDTO;
 import com.example.blog.DTO.CommentUserDTO;
 import com.example.blog.DTO.PostDTO;
+import com.example.blog.DTO.UserRegisterDTO;
 import com.example.blog.entities.Comment;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
@@ -73,7 +74,7 @@ public class CommentController {
     */
 
     @PostMapping(value = "/comment")
-    public String createNewComment(@ModelAttribute @Valid CommentUserDTO commentUserDTO, BindingResult bindingResult, Principal principal) throws RoleNotFoundException {
+    public String createNewComment(@ModelAttribute @Valid CommentUserDTO commentUserDTO, BindingResult bindingResult, Principal principal, Model model) throws RoleNotFoundException {
         log.severe("COS TAM");
         String username="";
         if(principal != null) {
@@ -87,7 +88,6 @@ public class CommentController {
             return "redirect:/";
         }
 
-
         if(optionaluser.isPresent()) {
             commentUserDTO.setUser(optionaluser.get().getUsername());
             Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
@@ -99,18 +99,29 @@ public class CommentController {
         {
             log.severe("NIE JEST ZALOGOWANY");
             User user = userService.commentUserDTOtoUser(commentUserDTO);
-            user.setEmail("michal.milewski98@gmail.com");
+            //user.setEmail("michal.milewski98@gmail.com");
             //user.setPassword("PASSWORD");
             user.setPassword(PasswordGeneration.generatePassword());
-            emailService.sendEmail(user, user.getPassword());
+            //emailService.sendEmail(user, user.getPassword());
             userService.saveNewBlogUser(user);
             commentUserDTO.setUser(user.getUsername());
             Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
             commentService.save(comment);
-            //model.addAttribute("user", user);
-            //return "comment_register";
-            return "redirect:/";
+            UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
+            userRegisterDTO.setId(user.getId());
+            model.addAttribute("user", userRegisterDTO);
+            return "comment_register";
         }
+    }
+
+    @PostMapping(value = "/commentRegister")
+    public String commentRegister(@ModelAttribute UserRegisterDTO userRegisterDTO) throws RoleNotFoundException {
+        //user.setPassword(PasswordGeneration.generatePassword());
+        User user = userService.getUserById(userRegisterDTO.getId()).get();
+        user.setEmail(userRegisterDTO.getEmail());
+        emailService.sendEmail(user, user.getPassword());
+        userService.save(user);
+        return "index";
     }
 
     @GetMapping(value = "/comment/{id}")
@@ -122,7 +133,6 @@ public class CommentController {
         model.addAttribute("comment", commentDTO);
         model.addAttribute("user", user);
         return "/new_comment";
-
         */
 
         CommentUserDTO commentUserDTO = new CommentUserDTO();

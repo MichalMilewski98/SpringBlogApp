@@ -17,7 +17,7 @@ public class PasswordGeneration {
                 new CharacterRule(EnglishCharacterData.Digit, 1),
                 new CharacterRule(EnglishCharacterData.Special, 1));
        PasswordGenerator passwordGenerator = new PasswordGenerator();
-       String password = passwordGenerator.generatePassword(10, rules);
+       String password = passwordGenerator.generatePassword(20, rules);
 
        return password;
     }
