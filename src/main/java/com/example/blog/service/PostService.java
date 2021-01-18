@@ -41,13 +41,13 @@ public class PostService {
 
     public void delete(Long id) {postRepository.deleteById(id);}
 
-    public List<Post> getUserPosts()
+    public List<Post> getUserPosts(User user)
     {
         List<Post> userPosts = new ArrayList<>();
-        for (Post post : postRepository.findAll())
+        List<Post> posts = user.getPosts();
+        for (Post post : posts)
         {
-            if(post.isIsprivate())
-                userPosts.add(post);
+            userPosts.add(post);
         }
         return userPosts;
     }

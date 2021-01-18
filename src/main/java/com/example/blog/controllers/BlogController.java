@@ -3,17 +3,14 @@ package com.example.blog.controllers;
 import com.example.blog.DTO.PostDTO;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
-import com.example.blog.entities.Validation.PasswordGeneration;
 import com.example.blog.service.PostService;
 import com.example.blog.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.support.SessionStatus;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -30,6 +27,7 @@ public class BlogController {
     private PostService postService;
     private UserService userService;
 
+
     @GetMapping(value = "/posts")
     public List<Post> posts()
     {
@@ -44,9 +42,15 @@ public class BlogController {
     }
 
     @GetMapping("/user_posts")
-    public String getUserHomepage(Model model, String keyword)
+    public String getUserHomepage(Model model, String keyword, Principal principal)
     {
-        List<Post> posts = postService.getUserPosts();
+        String username="";
+        if(principal.getName()!= null)
+        {
+            username = principal.getName();
+        }
+        User postAuthor = userService.getUser(username).get();
+        List<Post> posts = postService.getUserPosts(postAuthor);
         List<PostDTO> postsDTO = new ArrayList<>();
         for (Post post : posts)
         {
@@ -107,18 +111,11 @@ public class BlogController {
         if (bindingResult.hasErrors()) {
             return "new_post";
         }
-        log.severe("principal :" + principal.getName());
-        String username = principal.getName();
-        //if (principal != null) {
-        //    authUsername = principal.getName();
-        //}
-        Optional<User> optionaluser = userService.getUser(username);
-        log.severe("optional :" + optionaluser.get().getUsername());
-        log.severe("optional :" + postDTO.isIsprivate());
 
+        String username = principal.getName();
+        Optional<User> optionaluser = userService.getUser(username);
         postDTO.setPost_authors(optionaluser.get().getUsername());
         Post post = postService.postDTOtoPost(postDTO);
-
         postService.insert(post);
 
         return "redirect:/";
@@ -133,7 +130,7 @@ public class BlogController {
         }
 
         Optional<User> optionaluser = userService.getUser(username);
-        //log.severe(optionaluser.get().getUsername());
+
         if (optionaluser.isPresent()) {
             PostDTO postDTO = new PostDTO();
             model.addAttribute("post", postDTO);
@@ -168,23 +165,48 @@ public class BlogController {
                 break;
             }
         }
-        if(check)
+
+        if(check || userService.findAdmin(principal))
         {
             postService.delete(id);
             return "redirect:/";
         }
-
         return "redirect:/post/" + id;
     }
 
     @GetMapping("edit_post/{id}")
-    public String getEditPost(@PathVariable Long id, Model model)
+    public String getEditPost(@PathVariable Long id, Model model, Principal principal)
     {
+        boolean check=false;
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
         Post currentPost = postService.getPost(id);
-        PostDTO postDTO = postService.postToPostDTO(currentPost);
-        model.addAttribute("post", postDTO);
+        Optional<User> optionaluser = userService.getUser(username);
 
-        return "edit_post";
+        if (optionaluser.isPresent()) {
+            for (User user : currentPost.getPost_authors())
+            {
+                if(user.getUsername().equals(principal.getName()))
+                {
+                    check = true;
+                    break;
+                }
+            }
+            if(check || userService.findAdmin(principal)) {
+                PostDTO postDTO = postService.postToPostDTO(currentPost);
+                model.addAttribute("post", postDTO);
+                return "edit_post";
+            }
+        }
+        else
+        {
+            model.addAttribute("errorData", true);
+            return "redirect:/post/" + currentPost.getId();
+        }
+        model.addAttribute("errorData", true);
+        return "redirect:/post/" + currentPost.getId();
     }
 
     @PostMapping("update_post/{id}")

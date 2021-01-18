@@ -36,46 +36,10 @@ public class CommentController {
     private PostService postService;
     private EmailService emailService;
 
-  /*  @PostMapping(value = "/comment")
-    public String createNewComment(@ModelAttribute @Valid CommentDTO commentDTO, @ModelAttribute @Valid User user,BindingResult bindingResult, Principal principal, Model model) throws RoleNotFoundException {
-        log.severe("COS TAM");
-        String username="";
-        if(principal != null) {
-            username = principal.getName();
-        }
-        Optional<User> optionaluser = userService.getUser(username);
-
-        if(bindingResult.hasErrors())
-        {
-            log.severe("BINDING ERROR");
-            return "redirect:/";
-        }
-
-
-        if(optionaluser.isPresent()) {
-            commentDTO.setUser(optionaluser.get().getUsername());
-            Comment comment = commentService.commentDtoToComment(commentDTO);
-            commentService.save(comment);
-            log.severe("JEST ZALOGOWANY");
-            return "redirect:/post/" + comment.getPost().getId();
-        }
-        else
-        {
-            log.severe("NIE JEST ZALOGOWANY");
-            //userService.saveNewBlogUser(user);
-            //commentDTO.setUser(user.getUsername());
-            //Comment comment = commentService.commentDtoToComment(commentDTO);
-            //commentService.save(comment);
-            //model.addAttribute("user", user);
-            //return "comment_register";
-            return "redirect:/";
-        }
-    }
-    */
 
     @PostMapping(value = "/comment")
     public String createNewComment(@ModelAttribute @Valid CommentUserDTO commentUserDTO, BindingResult bindingResult, Principal principal, Model model) throws RoleNotFoundException {
-        log.severe("COS TAM");
+
         String username="";
         if(principal != null) {
             username = principal.getName();
@@ -84,25 +48,20 @@ public class CommentController {
 
         if(bindingResult.hasErrors())
         {
-            log.severe("BINDING ERROR");
             return "redirect:/";
         }
 
         if(optionaluser.isPresent()) {
+
             commentUserDTO.setUser(optionaluser.get().getUsername());
             Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
             commentService.save(comment);
-            log.severe("JEST ZALOGOWANY");
             return "redirect:/post/" + comment.getPost().getId();
         }
         else
         {
-            log.severe("NIE JEST ZALOGOWANY");
             User user = userService.commentUserDTOtoUser(commentUserDTO);
-            //user.setEmail("michal.milewski98@gmail.com");
-            //user.setPassword("PASSWORD");
             user.setPassword(PasswordGeneration.generatePassword());
-            //emailService.sendEmail(user, user.getPassword());
             userService.saveNewBlogUser(user);
             commentUserDTO.setUser(user.getUsername());
             Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
@@ -110,6 +69,7 @@ public class CommentController {
             UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
             userRegisterDTO.setId(user.getId());
             model.addAttribute("user", userRegisterDTO);
+
             return "comment_register";
         }
     }
@@ -121,24 +81,17 @@ public class CommentController {
         user.setEmail(userRegisterDTO.getEmail());
         emailService.sendEmail(user, user.getPassword());
         userService.save(user);
+
         return "index";
     }
 
     @GetMapping(value = "/comment/{id}")
     public String showComment(@PathVariable Long id, Model model) {
 
-       /* CommentDTO commentDTO = new CommentDTO();
-        User user = new User();
-        commentDTO.setPost_id(id);
-        model.addAttribute("comment", commentDTO);
-        model.addAttribute("user", user);
-        return "/new_comment";
-        */
-
         CommentUserDTO commentUserDTO = new CommentUserDTO();
-        //User user = new User();
         commentUserDTO.setPost_id(id);
         model.addAttribute("comment", commentUserDTO);
+
         return "/new_comment";
     }
 
@@ -152,11 +105,30 @@ public class CommentController {
     }
 
     @GetMapping(value = "/delete_comment/{id}")
-    public String deleteComment(@PathVariable Long id) {
+    public String deleteComment(@PathVariable Long id, Principal principal) {
+
+        String username="";
+        if(principal != null) {
+            username = principal.getName();
+        }
 
         Comment comment = commentService.getComment(id);
-        commentService.delete(comment);
+        Optional<User> optionaluser = userService.getUser(username);
+
+        if (optionaluser.isPresent()) {
+            Long postId = comment.getPost().getId();
+            Post post = postService.getPost(postId);
+            List<User> authors = post.getPost_authors();
+            if(username.equals(comment.getUser().getUsername()) || userService.isAuthor(authors, username))
+            {
+                commentService.delete(comment);
+            }
+            else
+                return "redirect:/post/" + comment.getPost().getId();
+
+        }
         return "redirect:/post/" + comment.getPost().getId();
+
     }
 
     @GetMapping(value = "/edit_comment/{id}")
@@ -168,8 +140,6 @@ public class CommentController {
         }
 
         Optional<User> optionaluser = userService.getUser(username);
-
-
 
         if (optionaluser.isPresent())
         {
@@ -193,8 +163,6 @@ public class CommentController {
             username = principal.getName();
         }
         Optional<User> optionaluser = userService.getUser(username);
-        log.severe("comment user : " + commentDTO.getUser());
-        log.severe(principal.getName());
         Long postId = commentDTO.getPost_id();
         Post post = postService.getPost(postId);
         List<User> authors = post.getPost_authors();
@@ -209,13 +177,11 @@ public class CommentController {
             }
             else
             {
-                log.severe("principal get name");
                 return "index";
             }
         }
         else
         {
-            log.severe("optional not found");
             return "index";
         }
 

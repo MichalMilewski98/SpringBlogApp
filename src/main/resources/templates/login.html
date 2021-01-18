@@ -14,7 +14,7 @@
             <a class="left" th:href="@{/new_post}">New Post</a>
         </span>
         <span sec:authorize="isAuthenticated()">
-            <a class="left" th:href="@{/user_posts}">Private posts</a>
+            <a class="left" th:href="@{/user_posts}">My posts</a>
         </span>
         <span sec:authorize="isAuthenticated()">
         <a class="right" th:href="@{/logout}">Logout</a>

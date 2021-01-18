@@ -7,6 +7,7 @@ import com.example.blog.entities.User;
 import com.example.blog.repositories.RoleRepository;
 import com.example.blog.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,11 +16,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.RoleNotFoundException;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Log
 @Service
 @AllArgsConstructor
 public class  UserService implements UserDetailsService {
@@ -38,7 +41,6 @@ public class  UserService implements UserDetailsService {
         } else {
             throw new UsernameNotFoundException("No user found with username " + username);
         }
-//        return blogUser.orElseThrow(() -> new UsernameNotFoundException("No user found with username \" + username"));
     }
 
 
@@ -84,6 +86,20 @@ public class  UserService implements UserDetailsService {
         user.setUser_roles(roles);
 
         return this.userRepository.saveAndFlush(user);
+    }
+    
+    public boolean findAdmin(Principal principal)
+    {
+        String name = principal.getName();
+        log.severe(name);
+        User user = userRepository.findByUsername(name).get();
+        List<Role> roles = user.getUser_roles();
+        for (Role role : roles)
+        {
+            if(role.getRole().equals("ROLE_ADMIN"))
+                return true;
+        }
+        return false;
     }
 
     public boolean isAuthor(List<User> users, String username)

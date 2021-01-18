@@ -16,7 +16,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
             <a class="left" th:href="@{/new_post}">New Post</a>
         </span>
         <span sec:authorize="isAuthenticated()">
-            <a class="left" th:href="@{/user_posts}">Private posts</a>
+            <a class="left" th:href="@{/user_posts}">My posts</a>
         </span>
         <span sec:authorize="isAuthenticated()">
         <a class="right" th:href="@{/logout}">Logout</a>
@@ -54,6 +54,13 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
           th:object="${user}"
           method="post">
         <div>
+        <label>
+            <div class="alert-red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error
+            </div>
+            <input type="text" th:field="*{email}" placeholder="Email"/>
+        </label>
+        </div>
+        <div>
             <label>
                 <div class="alert-red" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Username Error
                 </div>
@@ -67,6 +74,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
                 <input type="password" th:field="*{password}" placeholder="Password"/>
             </label>
         </div>
+
         <div>
             <button class="green-btn" type="submit">Register</button>
         </div>

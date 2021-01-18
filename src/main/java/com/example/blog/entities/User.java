@@ -28,6 +28,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Unique
     @Column(name = "email", unique = true)
     @Email(message = "Wrong email format")
     private String email;

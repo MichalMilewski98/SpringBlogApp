@@ -11,8 +11,11 @@
 <header>
     <div class="topnav">
         <a class="home" th:href="@{/}">Home</a>
-        <span sec:authorize="hasRole('ROLE_USER')">
+        <span sec:authorize="isAuthenticated()">
             <a class="left" th:href="@{/new_post}">New Post</a>
+        </span>
+        <span sec:authorize="isAuthenticated()">
+            <a class="left" th:href="@{/user_posts}">My posts</a>
         </span>
         <span sec:authorize="isAuthenticated()">
         <a class="right" th:href="@{/logout}">Logout</a>
