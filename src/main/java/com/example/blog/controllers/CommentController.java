@@ -129,6 +129,8 @@ public class CommentController {
         }
         return "redirect:/post/" + comment.getPost().getId();
 
+
+
     }
 
     @GetMapping(value = "/edit_comment/{id}")
