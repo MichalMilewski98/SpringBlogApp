@@ -40,8 +40,6 @@
             </form>
             <h2>Sort by: </h2>
             <a th:href="@{'/sort' + '?sortField=title'}">Title</a>
-            <a th:href="@{'/sort' + '?sortField=post_content'}">Text</a>
-            <a th:href="@{'/sort' + '?sortField=tag'}">Tag</a>
         </span>
     </div>
 </header>
@@ -53,7 +51,6 @@
         <br>
         <h5 th:text="'Published by ' + ${post.post_authors}">Post author</h5>
         <br>
-        <p class="tags" th:text="${post.tag}">tags</p>
     </div>
 </div>
 

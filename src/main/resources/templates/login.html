@@ -30,16 +30,6 @@
     </div>
     <div class="header">
         <h2>Blog app</h2>
-        <span class ="right">
-            <form  th:action="@{/}" method="get">
-                <input id="txtSearch" type="text" name="keyword">
-                <button type="submit">Submit</button>
-            </form>
-            <h2>Sort by: </h2>
-            <a th:href="@{'/sort' + '?sortField=title'}">Title</a>
-            <a th:href="@{'/sort' + '?sortField=post_content'}">Text</a>
-            <a th:href="@{'/sort' + '?sortField=tag'}">Tag</a>
-        </span>
     </div>
 </header>
 

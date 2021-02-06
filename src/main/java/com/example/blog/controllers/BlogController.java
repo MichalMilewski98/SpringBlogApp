@@ -157,19 +157,19 @@ public class BlogController {
     {
         boolean check = false;
         Post post = postService.getPost(id);
-        for (User user : post.getPost_authors())
-        {
-            if(user.getUsername().equals(principal.getName()))
-            {
-                check = true;
-                break;
+        String username ="";
+        if(principal != null) {
+            for (User user : post.getPost_authors()) {
+                if (user.getUsername().equals(principal.getName())) {
+                    check = true;
+                    break;
+                }
             }
-        }
 
-        if(check || userService.findAdmin(principal))
-        {
-            postService.delete(id);
-            return "redirect:/";
+            if (check || userService.findAdmin(principal)) {
+                postService.delete(id);
+                return "redirect:/";
+            }
         }
         return "redirect:/post/" + id;
     }
