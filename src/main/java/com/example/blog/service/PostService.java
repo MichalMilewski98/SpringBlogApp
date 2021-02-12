@@ -23,7 +23,6 @@ public class PostService {
     private PostRepository postRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
-    private UserService userService;
 
     public List<Post> getAllPosts()
     {

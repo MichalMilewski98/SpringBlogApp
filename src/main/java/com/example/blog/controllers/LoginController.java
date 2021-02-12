@@ -11,17 +11,9 @@ public class LoginController {
     @GetMapping("/login")
     public String login(Principal principal) {
 
-        if (principal != null) {
-            return "redirect:/";
-        } else {
+        if (principal != null) { return "redirect:/"; }
 
-          // get current user from Security Context
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        if (!username.equals("anonymousUser")) {
-//            return "redirect:/"; // if user already logged in redirect back to root context
-//        } else {
-            return "login";
-        }
+        return "login";
     }
 
 }

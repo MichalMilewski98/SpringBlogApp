@@ -25,18 +25,4 @@ public class BlogApplication {
 		SpringApplication.run(BlogApplication.class, args);
 	}
 
-/*	@Bean
-	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
-		return args -> {
-
-			System.out.println("Starting..");
-
-			UserService userService = ctx.getBean(UserService.class);
-			userService.saveAdmin("admin","password","admin@gmail.com");
-
-		};
-	}
-
- */
-
 }

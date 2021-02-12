@@ -41,9 +41,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/**").hasRole("ADMIN")
                 .antMatchers("/new_post/**", "/edit_post/**", "/post/**", "/delete_post/**", "/my_posts/**", "/comment/**", "/new_comment/**").hasRole("USER")
-//                .antMatchers("/new_post/**", "/edit_post/**", "/post/**").hasRole("USER")
-//                .antMatchers("/deletePost/**").hasRole("USER")
-//                .antMatchers("/deletePost/**").hasRole("ADMIN")
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -66,14 +63,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
         authenticationManagerBuilder
                 .jdbcAuthentication()
-                .usersByUsernameQuery(USERS_SQL_QUERY) // not really necessary, as users table follows default Spring Security User schema
+                .usersByUsernameQuery(USERS_SQL_QUERY)
                 .authoritiesByUsernameQuery(AUTHORITIES_SQL_QUERY)  // a must as using customized authorities table, many to many variation
                 .dataSource(dataSource)
                 .passwordEncoder(bcryptEncoder());
 
-//        authenticationManagerBuilder
-//                .inMemoryAuthentication()
-//                .withUser("user").password(bcryptEncoder().encode("password")).roles("USER").and()
-//                .withUser("admin").password(bcryptEncoder().encode("password")).roles("USER", "ADMIN");
     }
 }

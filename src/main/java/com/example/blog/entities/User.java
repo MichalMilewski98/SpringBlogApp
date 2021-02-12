@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.CsvBindByName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -71,8 +73,6 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public User(){}
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -111,19 +111,5 @@ public class User implements UserDetails {
         return "" + username;
     }
 
-
-
-  /*  @Override
-    public String toString() {
-        return "User{" +
-//                "id=" + id +
-                ", username='" + username + '\'' +
-//                ", password='" + password + '\'' +
-//                ", posts=" + posts +
-//                ", user_roles=" + user_roles +
-                '}';
-    }
-
-   */
 
 }

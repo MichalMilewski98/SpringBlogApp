@@ -42,12 +42,9 @@ public class Post {
     @NotEmpty(message = "Title cant be empty")
     private String title;
 
-    @CsvBindByName
     @NotEmpty(message = "Post cant be empty")
     @Column(length=9999)
     private String post_content;
-
-    //private String tag;
 
 
     private boolean isprivate;
@@ -62,22 +59,6 @@ public class Post {
     }
 
     public Post(){}
-
-
-    public void addComment(Comment comment)
-    {
-        comments.add(comment);
-    }
-
-    public void removeComment(Comment comment)
-    {
-        comments.remove(comment);
-    }
-
-    public void addAuthor(User user)
-    {
-        post_authors.add(user);
-    }
 
 
    @Override

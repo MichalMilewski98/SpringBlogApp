@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log
 @RestController
@@ -21,28 +22,22 @@ public class PostController {
     private UserService userService;
 
     @GetMapping(value = "/post/{id}/json")
-    public PostDTO getPostInJson(@PathVariable Long id)
-    {
+    public PostDTO getPostInJson(@PathVariable Long id) {
+
         Post post = postService.getPost(id);
         PostDTO postDTO = postService.postToPostDTO(post);
+
         return postDTO;
     }
-
 
     @GetMapping(value = "/{username}/json")
     public List<PostDTO> getAuthorPostsInJson(@PathVariable String username) {
 
-        List<PostDTO> authorPosts = new ArrayList<>();
-        List<Post> allPosts =  postService.getAllPosts();
-        log.severe("count : " + allPosts.size());
-        for (Post post : allPosts)
-        {
-            PostDTO postDTO = postService.postToPostDTO(post);
-                if(postDTO.getPost_authors().contains(username))
-                    authorPosts.add(postDTO);
-        }
-        log.severe("count : " + authorPosts.size());
-        return authorPosts;
-    }
-}
+        return postService.getUserPosts(userService.getUser(username).get())
+                .stream()
+                .map(postService::postToPostDTO)
+                .collect(Collectors.toList());
 
+    }
+
+}

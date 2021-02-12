@@ -30,15 +30,14 @@ public class RegisterController {
     @GetMapping(value = "/register")
     public String registration(Model model) {
 
-        log.severe("LOGGING");
         User user = new User();
         model.addAttribute("user", user);
+
         return "register";
     }
 
     @PostMapping(value = "/register")
-    public String createNewUser(@Valid @ModelAttribute User user, BindingResult bindingResult, SessionStatus sessionStatus) throws RoleNotFoundException {
-        log.severe("REGISTER");
+    public String createNewUser(@Valid @ModelAttribute User user, BindingResult bindingResult) throws RoleNotFoundException {
 
         if (userService.getUser(user.getUsername()).isPresent()) {
             bindingResult
@@ -46,20 +45,12 @@ public class RegisterController {
                             "Username already in use");
         }
 
-       if (bindingResult.hasErrors()) {
-            System.err.println("New user did not validate");
-            return "register";
-        }
+       if (bindingResult.hasErrors()) { return "register"; }
 
         userService.saveNewBlogUser(user);
-        Authentication auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getUser_roles());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        System.err.println("AuthToken: " + auth);  // for testing debugging purposes
-        sessionStatus.setComplete();
-        System.err.println("SecurityContext Principal: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        log.severe("username : " + user.getUsername());
-        log.severe("role : " + user.getUser_roles().get(0).getRole());
-        return "redirect:/";
+        userService.loginNewUser(user);
 
+        return "redirect:/";
     }
+
 }

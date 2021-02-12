@@ -9,6 +9,9 @@ import com.example.blog.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -69,6 +72,12 @@ public class  UserService implements UserDetailsService {
             //throw new RoleNotFoundException("Default role not found for blog user with username " + user.getUsername());
             return this.userRepository.saveAndFlush(user);
         }
+    }
+
+    public void loginNewUser(User user)
+    {
+        Authentication auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getUser_roles());
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     public User saveAdmin(String username, String password, String email) throws RoleNotFoundException {
