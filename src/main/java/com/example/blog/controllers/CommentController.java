@@ -36,39 +36,19 @@ public class CommentController {
     private PostService postService;
     private EmailService emailService;
 
-
     @PostMapping(value = "/comment")
-    public String createNewComment(@ModelAttribute @Valid CommentUserDTO commentUserDTO, BindingResult bindingResult, Principal principal, Model model) throws RoleNotFoundException {
+    public String createNewComment(@ModelAttribute @Valid CommentUserDTO commentUserDTO, Principal principal, Model model) throws RoleNotFoundException {
+        Optional<User> optionalUser = userService.getUser(userService.getLoggedUserUsername(principal));
 
-        String username="";
-        if(principal != null) {
-            username = principal.getName();
-        }
-        Optional<User> optionaluser = userService.getUser(username);
-
-        if(bindingResult.hasErrors())
-        {
-            return "redirect:/";
-        }
-
-        if(optionaluser.isPresent()) {
-
-            commentUserDTO.setUser(optionaluser.get().getUsername());
+        if(optionalUser.isPresent()) {
+            commentUserDTO.setUser(optionalUser.get().getUsername());
             Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
             commentService.save(comment);
+
             return "redirect:/post/" + comment.getPost().getId();
         }
-        else
-        {
-            User user = userService.commentUserDTOtoUser(commentUserDTO);
-            user.setPassword(PasswordGeneration.generatePassword());
-            userService.saveNewBlogUser(user);
-            commentUserDTO.setUser(user.getUsername());
-            Comment comment = commentService.commentUserDTOtoComment(commentUserDTO);
-            commentService.save(comment);
-            UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
-            userRegisterDTO.setId(user.getId());
-            model.addAttribute("user", userRegisterDTO);
+        else {
+            model.addAttribute("user", commentService.createCommentWithoutAccount(commentUserDTO));
 
             return "comment_register";
         }
@@ -107,83 +87,58 @@ public class CommentController {
     @GetMapping(value = "/delete_comment/{id}")
     public String deleteComment(@PathVariable Long id, Principal principal) {
 
-        String username="";
-        if(principal != null) {
-            username = principal.getName();
-        }
-
         Comment comment = commentService.getComment(id);
-        Optional<User> optionaluser = userService.getUser(username);
+        Optional<User> optionalUser = userService.getUser(userService.getLoggedUserUsername(principal));
 
-        if (optionaluser.isPresent()) {
+        if (optionalUser.isPresent()) {
             Long postId = comment.getPost().getId();
             Post post = postService.getPost(postId);
-            List<User> authors = post.getPost_authors();
-            if(username.equals(comment.getUser().getUsername()) || userService.isAuthor(authors, username))
+            if (userService.canEditComment(post.getPost_authors(), principal.getName(), comment.getUser().getUsername()))
             {
                 commentService.delete(comment);
             }
             else
                 return "redirect:/post/" + comment.getPost().getId();
-
         }
         return "redirect:/post/" + comment.getPost().getId();
-
     }
 
     @GetMapping(value = "/edit_comment/{id}")
     public String getEditComment(@PathVariable Long id, Model model, Principal principal) {
 
-        String username="";
-        if(principal != null) {
-            username = principal.getName();
-        }
+        Optional<User> optionalUser = userService.getUser(userService.getLoggedUserUsername(principal));
 
-        Optional<User> optionaluser = userService.getUser(username);
-
-        if (optionaluser.isPresent())
+        if (optionalUser.isPresent())
         {
             Comment currentComment = commentService.getComment(id);
             CommentDTO commentDTO = commentService.commentToCommentDto(currentComment);
             model.addAttribute("comment", commentDTO);
+
             return "edit_comment";
         }
-        else
-        {
+        else {
             return "index";
         }
-
     }
 
     @PostMapping(value = "/update_comment/{id}")
     public String editComment(@Valid @ModelAttribute CommentDTO commentDTO, Principal principal) {
 
-        String username="";
-        if(principal != null) {
-            username = principal.getName();
-        }
-        Optional<User> optionaluser = userService.getUser(username);
+        Optional<User> optionalUser = userService.getUser(userService.getLoggedUserUsername(principal));
         Long postId = commentDTO.getPost_id();
         Post post = postService.getPost(postId);
-        List<User> authors = post.getPost_authors();
 
-        if (optionaluser.isPresent())
-        {
-            if(username.equals(commentDTO.getUser()) || userService.isAuthor(authors, username))
-            {
+        if (optionalUser.isPresent()) {
+
+            if(userService.canEditComment(post.getPost_authors(), optionalUser.get().getUsername(),commentDTO.getUser())) {
                 Comment comment = commentService.commentDtoToComment(commentDTO);
                 commentService.save(comment);
+
                 return "redirect:/post/" + commentDTO.getPost_id();
             }
-            else
-            {
                 return "index";
-            }
         }
-        else
-        {
             return "index";
-        }
-
     }
+
 }

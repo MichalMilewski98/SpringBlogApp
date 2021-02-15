@@ -45,10 +45,11 @@ public class BlogController {
     public String getUserHomepage(Model model, String keyword, Principal principal)
     {
         String username="";
-        if(principal.getName()!= null)
+        if (principal.getName() != null)
         {
             username = principal.getName();
         }
+
         User postAuthor = userService.getUser(username).get();
         List<Post> posts = postService.getUserPosts(postAuthor);
         List<PostDTO> postsDTO = new ArrayList<>();
@@ -56,14 +57,16 @@ public class BlogController {
         {
             postsDTO.add(postService.postToPostDTO(post));
         }
+
         List<Post> filteredPosts = postService.findByKeyword(keyword);
         List<PostDTO> filteredPostsDTO = new ArrayList<>();
+
         for (Post post : filteredPosts)
         {
             filteredPostsDTO.add(postService.postToPostDTO(post));
         }
 
-        if(keyword!=null)
+        if (keyword != null)
             model.addAttribute("posts", filteredPostsDTO);
         else
             model.addAttribute("posts", postsDTO);

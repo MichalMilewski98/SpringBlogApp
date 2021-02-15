@@ -41,8 +41,8 @@ public class RegisterController {
 
         if (userService.getUser(user.getUsername()).isPresent()) {
             bindingResult
-                    .rejectValue("username", "error.username",
-                            "Username already in use");
+            .rejectValue("username", "error.username",
+            "Username already in use");
         }
 
        if (bindingResult.hasErrors()) { return "register"; }

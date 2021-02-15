@@ -2,9 +2,11 @@ package com.example.blog.service;
 
 import com.example.blog.DTO.CommentDTO;
 import com.example.blog.DTO.CommentUserDTO;
+import com.example.blog.DTO.UserRegisterDTO;
 import com.example.blog.entities.Comment;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
+import com.example.blog.entities.Validation.PasswordGeneration;
 import com.example.blog.entities.exception.PostNotFoundException;
 import com.example.blog.repositories.CommentRepository;
 import com.example.blog.repositories.PostRepository;
@@ -13,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.var;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,33 +42,45 @@ public class CommentService {
 
     public List<Comment> findAllComments(){return commentRepository.findAll();}
 
-    public List<Comment> findCommentsByUser(String username)
-    {
+    public List<Comment> findCommentsByUser(String username) {
         return commentRepository.findCommentsByUser(userRepository.findUserByUsername(username));
     }
 
-    public User getCommentAuthor(String author)
-    {
+    public User getCommentAuthor(String author) {
         Optional<User> user = userRepository.findByUsername(author);
         return user.get();
     }
 
-    public Comment commentDtoToComment(CommentDTO commentDTO)
-    {
+    public Comment commentDtoToComment(CommentDTO commentDTO) {
         Comment comment = new Comment(commentDTO.getId(), commentDTO.getBody(), getCommentAuthor(commentDTO.getUser()), postService.getPost(commentDTO.getPost_id()));
         return comment;
     }
 
-    public CommentDTO commentToCommentDto(Comment comment)
-    {
+    public CommentDTO commentToCommentDto(Comment comment) {
         CommentDTO commentDTO = new CommentDTO(comment.getId(), comment.getBody(), comment.getUser().getUsername(), comment.getPost().getId());
         return commentDTO;
     }
 
-    public Comment commentUserDTOtoComment(CommentUserDTO commentUserDTO)
-    {
+    public Comment commentUserDTOtoComment(CommentUserDTO commentUserDTO) {
         Comment comment = new Comment(commentUserDTO.getId(), commentUserDTO.getBody(), getCommentAuthor(commentUserDTO.getUser()), postService.getPost(commentUserDTO.getPost_id()));
         return comment;
     }
+
+    public UserRegisterDTO createCommentWithoutAccount(CommentUserDTO commentUserDTO) throws RoleNotFoundException {
+
+        User user = userService.commentUserDTOtoUser(commentUserDTO);
+        user.setPassword(PasswordGeneration.generatePassword());
+        userService.saveNewBlogUser(user);
+        commentUserDTO.setUser(user.getUsername());
+        Comment comment = this.commentUserDTOtoComment(commentUserDTO);
+        this.save(comment);
+        UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
+        userRegisterDTO.setId(user.getId());
+
+        return userRegisterDTO;
+    }
+
+    public
+
 
 }
